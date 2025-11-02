@@ -1,0 +1,126 @@
+//MAIN PROCESS FILE
+import { createCanvas } from "canvas";
+import {
+    app,
+    BrowserWindow,
+    ipcMain,
+    nativeImage,
+    Tray,
+    Menu,
+} from "electron"
+import fs from 'fs';
+import path from 'path';
+
+// for setting up tray icon
+let tray;
+const green = nativeImage.createFromDataURL('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACOSURBVHgBpZLRDYAgEEOrEzgCozCCGzkCbKArOIlugJvgoRAUNcLRpvGH19TkgFQWkqIohhK8UEaKwKcsOg/+WR1vX+AlA74u6q4FqgCOSzwsGHCwbKliAF89Cv89tWmOT4VaVMoVbOBrdQUz+FrD6XItzh4LzYB1HFJ9yrEkZ4l+wvcid9pTssh4UKbPd+4vED2Nd54iAAAAAElFTkSuQmCC')
+
+//appData/roaming/weather-app
+const filePath = path.join(app.getPath('userData'), 'weather.json');
+
+//create icon
+const createIcon = (str) => {
+    //...code
+};
+
+//create window
+const createWindow = () => {
+    //create a window
+    const win = new BrowserWindow({
+        width: 500,
+        height: 500,
+        webPreferences: {
+            preload: path.join(app.getAppPath(), "preload.js"),
+            contextIsolation: true,
+            nodeIntegration: false,
+        }
+    });
+
+    win.loadFile('public/index.html');//html file
+    win.removeMenu();//remove the menu bar
+};
+
+//delete after 1 day
+const cleanOldFile = () => {
+    if (fs.existsSync(filePath) && Date.now() - fs.statSync(filePath).mtimeMs > 1 * 24 * 60 * 60 * 1000) {//3 days then remove from the appData/roaming folder
+        fs.unlinkSync(filePath);
+    };
+};
+
+app.whenReady().then(() => {
+
+    cleanOldFile();// delete the saved weather.json
+    createWindow();// init the window
+
+    tray = new Tray(green);
+
+    //when tray icon is click it will be opened
+    tray.on('click', () => {
+        const wins = BrowserWindow.getAllWindows();
+        if (wins.length === 0) {
+            createWindow();
+        } else {
+            const win = wins[0];
+            if (win.isMinimized()) win.restore();
+            win.focus();
+        }
+    });
+
+    ipcMain.on('temp', (event, arg) => {
+        // tray.setImage(createIcon(arg))
+        tray.setToolTip(arg);
+    });
+
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Open App',
+            click: () => {
+                const wins = BrowserWindow.getAllWindows()
+                if (wins.length === 0) {
+                    createWindow()
+                } else {
+                    wins[0].focus()
+                }
+            }
+        },
+        { role: 'quit' }
+    ]);
+
+    tray.setContextMenu(contextMenu);
+
+});
+
+// so the tray menu will work
+app.on('window-all-closed', () => {
+    // having this listener active will prevent the app from quitting.
+});
+
+
+// call api here it is more secure
+ipcMain.handle('get-api', async () => {
+
+    const latitude = 9.7392;
+    const longitude = 118.7353;
+
+    //if weather.json is available return
+    if (fs.existsSync(filePath)) {
+        const data = fs.readFileSync(filePath);
+        return { status: "🌤 cached weather data ", data: JSON.parse(data) };
+    };
+
+    console.log("🌤 Fetching new weather...");
+    const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weather_code&timezone=auto`
+    );
+    const data = await response.json();
+
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    return { status: "✅ Saved weather to JSON file", data: data };
+});
+
+// handles the weather codes 
+ipcMain.handle('get-weather-codes', async () => {
+    const filename = path.join(app.getAppPath(), "weather_codes.json");
+    const data = fs.readFileSync(filename, "utf8");
+    return JSON.parse(data);
+});
