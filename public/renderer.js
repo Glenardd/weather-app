@@ -6,9 +6,9 @@ const weather_type = await window.weatherStore.weather_code();
 //tell if day or night
 const day_or_night = (hours) => {
     const isDay = hours > 6 && hours < 20;
-    if(isDay === true){
-        return {time: "day", };
-    }else{
+    if (isDay === true) {
+        return { time: "day", };
+    } else {
         return "night";
     };
 };
@@ -42,9 +42,9 @@ const day_or_night = (hours) => {
     const weather_time = current_weather[0].time.getHours();
 
     // search the weather code using the weather number
-    const weather_day = day_or_night(weather_time) === 'day' ? weather_type[weather_number].day: weather_type[weather_number].night;
-
-    window.weatherStore.temp(weather_temp.toString() + " °C");
+    const weather_day = day_or_night(weather_time) === 'day' ? weather_type[weather_number].day : weather_type[weather_number].night;
+    const temp = weather_temp.toString() + " °C";
+    window.weatherStore.temp(temp);
 
     document.querySelector(".weather").innerHTML = `
         <img src="${weather_day.image}" alt="${weather_day.description}">

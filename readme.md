@@ -3,4 +3,5 @@
 - ~~display what weather~~
 - ~~display what temperature~~
 - ~~place as process in tray~~
-- display temp in tray icon
+- ~~display temp in tray icon~~
+- update real time

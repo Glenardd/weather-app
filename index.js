@@ -13,14 +13,30 @@ import path from 'path';
 
 // for setting up tray icon
 let tray;
-const green = nativeImage.createFromDataURL('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACOSURBVHgBpZLRDYAgEEOrEzgCozCCGzkCbKArOIlugJvgoRAUNcLRpvGH19TkgFQWkqIohhK8UEaKwKcsOg/+WR1vX+AlA74u6q4FqgCOSzwsGHCwbKliAF89Cv89tWmOT4VaVMoVbOBrdQUz+FrD6XItzh4LzYB1HFJ9yrEkZ4l+wvcid9pTssh4UKbPd+4vED2Nd54iAAAAAElFTkSuQmCC')
-
 //appData/roaming/weather-app
 const filePath = path.join(app.getPath('userData'), 'weather.json');
 
 //create icon
-const createIcon = (str) => {
-    //...code
+const str_to_image = (weather) => {
+    const canvas_ = createCanvas(16, 16);
+    const ctx = canvas_.getContext('2d');
+
+    // Draw and fill the circle first
+    ctx.fillStyle = 'green'; // Add color
+    ctx.beginPath();
+    ctx.fillRect(0, 0, canvas_.width, canvas_.height);
+    ctx.fill(); // Actually fill it with color
+
+    ctx.fillStyle = "white"; // color of font
+    ctx.font = "10px sans-serif"; // font
+    ctx.textBaseline = "middle" // the center point
+    ctx.textAlign = "center"; // align
+    ctx.fillText(`${weather}°`, canvas_.width / 2, canvas_.height / 2); //add now the text
+
+    const dataURL = canvas_.toBuffer('image/png');
+    const image_ = nativeImage.createFromBuffer(dataURL);
+
+    return image_;
 };
 
 //create window
@@ -37,7 +53,7 @@ const createWindow = () => {
     });
 
     win.loadFile('public/index.html');//html file
-    win.removeMenu();//remove the menu bar
+    // win.removeMenu();//remove the menu bar
 };
 
 //delete after 1 day
@@ -52,7 +68,8 @@ app.whenReady().then(() => {
     cleanOldFile();// delete the saved weather.json
     createWindow();// init the window
 
-    tray = new Tray(green);
+    //initial temp from starting
+    tray = new Tray(str_to_image(0));
 
     //when tray icon is click it will be opened
     tray.on('click', () => {
@@ -66,8 +83,14 @@ app.whenReady().then(() => {
         }
     });
 
+    //show current temp on system tray
     ipcMain.on('temp', (event, arg) => {
-        // tray.setImage(createIcon(arg))
+
+        //current temp
+        tray.setImage(str_to_image(arg.slice(0, 2)));
+        tray.setToolTip(arg);
+
+        tray.setImage(str_to_image(arg.slice(0, 2)));
         tray.setToolTip(arg);
     });
 
@@ -94,7 +117,6 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     // having this listener active will prevent the app from quitting.
 });
-
 
 // call api here it is more secure
 ipcMain.handle('get-api', async () => {
