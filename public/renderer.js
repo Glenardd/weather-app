@@ -46,9 +46,28 @@ const day_or_night = (hours) => {
     const temp = weather_temp.toString() + " °C";
     window.weatherStore.temp(temp);
 
-    document.querySelector(".weather").innerHTML = `
-        <img src="${weather_day.image}" alt="${weather_day.description}">
-        <h1>${weather_day.description}</h1>
-        <h2>${weather_temp} °C</h2>
-    `;
+    const info_weather = () => {
+
+        const date_ = new Date();
+        //time
+        let hours = date_.getHours();
+        let minutes = date_.getMinutes();
+        const seconds = date_.getSeconds();
+
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours  % 12 || 12;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+
+        document.querySelector(".weather").innerHTML = `
+            <img src="${weather_day.image}" alt="${weather_day.description}">
+            <h1>${weather_day.description}</h1>
+            <h2>${weather_temp} °C</h2>
+            <h3>${hours} : ${minutes} : ${seconds} ${ampm}</h3>    
+        `;
+    };
+
+    //update everysecond
+    setInterval(info_weather, 1000);
+    info_weather();
+
 })();
