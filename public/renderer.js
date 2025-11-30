@@ -85,10 +85,14 @@ locate_form.innerHTML = `
 const locate_btn = locate_form.querySelector('.locator');
 
 locate_btn.addEventListener("click", async () => {
-    const lat = document.querySelector("#latitude").value;
-    const lon = document.querySelector("#longitude").value;
+    const lat = document.querySelector("#latitude");
+    const lon = document.querySelector("#longitude");
 
-    await window.weatherStore.location({ latitude: lat, longitude: lon });
+    await window.weatherStore.location({ latitude: lat.value, longitude: lon.value });
 
     await weather_update()
+
+    // clear input after the event
+    lat.value = "";
+    lon.value = "";
 });
