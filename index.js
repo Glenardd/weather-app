@@ -14,6 +14,10 @@ import path from 'path';
 // for setting up tray icon
 let tray;
 //appData/roaming/weather-app
+
+let latitude;
+let longitude;
+
 const filePath = path.join(app.getPath('userData'), 'weather.json');
 
 //create icon
@@ -58,7 +62,7 @@ const createWindow = () => {
 
 //delete after 1 day
 const cleanOldFile = () => {
-    if (fs.existsSync(filePath) && Date.now() - fs.statSync(filePath).mtimeMs > 1 * 24 * 60 * 60 * 1000) {//3 days then remove from the appData/roaming folder
+    if (fs.existsSync(filePath) && Date.now() - fs.statSync(filePath).mtimeMs > 1 * 24 * 60 * 60 * 1000) {//1 day then remove from the appData/roaming folder
         fs.unlinkSync(filePath);
     };
 };
@@ -118,17 +122,20 @@ app.on('window-all-closed', () => {
     // having this listener active will prevent the app from quitting.
 });
 
+// send the location string to renderer
+ipcMain.handle('locate', async (event, arg) => {
+    latitude = arg.latitude;
+    longitude = arg.longitude;
+});
+
 // call api here it is more secure
 ipcMain.handle('get-api', async () => {
 
-    const latitude = 9.7392;
-    const longitude = 118.7353;
+    // const latitude = 9.7392;
+    // const longitude = 118.7353;
 
     //if weather.json is available return
-    if (fs.existsSync(filePath)) {
-        const data = fs.readFileSync(filePath);
-        return { status: "🌤 cached weather data ", data: JSON.parse(data) };
-    };
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 
     console.log("🌤 Fetching new weather...");
     const response = await fetch(
@@ -146,6 +153,3 @@ ipcMain.handle('get-weather-codes', async () => {
     const data = fs.readFileSync(filename, "utf8");
     return JSON.parse(data);
 });
-
-// send the location string to renderer
-ipcMain.handle('locate', async ()=> console.log("located"));
