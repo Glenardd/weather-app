@@ -84,7 +84,7 @@ app.whenReady().then(() => {
     });
 
     //show current temp on system tray
-    ipcMain.on('temp', (event, arg) => {
+    ipcMain.handle('temp', (event, arg) => {
 
         //current temp
         tray.setImage(str_to_image(arg.slice(0, 2)));
@@ -146,3 +146,6 @@ ipcMain.handle('get-weather-codes', async () => {
     const data = fs.readFileSync(filename, "utf8");
     return JSON.parse(data);
 });
+
+// send the location string to renderer
+ipcMain.handle('locate', async ()=> console.log("located"));
