@@ -5,26 +5,25 @@ body{
     background-color: rgb(227, 172, 69);
 }
 
-.location{
-    position: absolute;
-    top: 15px;
-    left: 15px;
-}
-
 .weather{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
-img{
+.location {
+   margin-top: 20px;
+}
+
+.location-form {
+    display: flex;
+    align-items: center;     /* vertically center inputs + icon */
+    justify-content: center; /* center entire row */
+    gap: 10px;               /* spacing */
+}
+
+.locator {
     width: 45px;
     height: 45px;
-}
-
-img:hover{
-    filter: opacity(0.2);
     cursor: pointer;
 }
