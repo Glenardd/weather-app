@@ -1,6 +1,3 @@
-//secret
-const apiResponse = await window.weatherStore.api();
-
 const weather_type = await window.weatherStore.weather_code();
 
 //tell if day or night
@@ -13,9 +10,11 @@ const day_or_night = (hours) => {
     };
 };
 
+let weatherInterval;
+
 //display current weather and temp base on date and time 
-(async () => {
-    const weather = await apiResponse;
+const weather_update = async () => {
+    const weather = await window.weatherStore.api();
     // console.log(weather.status, " ", weather.data);
 
     const hour_ = weather.data.hourly.time;
@@ -46,14 +45,6 @@ const day_or_night = (hours) => {
     const temp = weather_temp.toString() + " °C";
     window.weatherStore.temp(temp);
 
-    //  locate button
-    const locate_ = document.querySelector(".location");
-    locate_.innerHTML = '<img src="location.png">'
-
-    locate_.addEventListener("click", async() => {
-        await window.weatherStore.location();
-    });
-
     const info_weather = () => {
 
         const date_ = new Date();
@@ -63,7 +54,7 @@ const day_or_night = (hours) => {
         const seconds = date_.getSeconds();
 
         const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours  % 12 || 12;
+        hours = hours % 12 || 12;
         minutes = minutes < 10 ? '0' + minutes : minutes;
 
         document.querySelector(".weather").innerHTML = `
@@ -75,7 +66,29 @@ const day_or_night = (hours) => {
     };
 
     //update everysecond
-    setInterval(info_weather, 1000);
+    if (weatherInterval) clearInterval(weatherInterval);
+    weatherInterval = setInterval(info_weather, 1000);
     info_weather();
 
-})();
+};
+
+//  location form
+const locate_form = document.querySelector(".location");
+locate_form.innerHTML = `
+        <div class="location-form">
+            <input type="text" id="latitude" name="latitude" placeholder="latitude">
+            <input type="text" id="longitude" name="longitude" placeholder="longitude">
+            <img class="locator" src="location.png">
+        </div>
+    `;
+//button for submitting
+const locate_btn = locate_form.querySelector('.locator');
+
+locate_btn.addEventListener("click", async () => {
+    const lat = document.querySelector("#latitude").value;
+    const lon = document.querySelector("#longitude").value;
+
+    await window.weatherStore.location({ latitude: lat, longitude: lon });
+
+    await weather_update()
+});
