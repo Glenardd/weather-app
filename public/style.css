@@ -27,3 +27,7 @@ body{
     height: 45px;
     cursor: pointer;
 }
+
+.locator:hover{
+    filter: opacity(0.2);
+}
