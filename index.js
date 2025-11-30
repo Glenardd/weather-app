@@ -138,7 +138,10 @@ ipcMain.handle('get-api', async () => {
     // const latitude = 9.7392;
     // const longitude = 118.7353;
 
-    //if weather.json is available return
+    // do not do anything if input is empty
+    if(latitude === "" || longitude === "") return "";
+
+    // rewrite again if lat and lon are called
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 
     console.log("🌤 Fetching new weather...");
