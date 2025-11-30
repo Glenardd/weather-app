@@ -90,7 +90,11 @@ app.whenReady().then(() => {
     //show current temp on system tray
     ipcMain.handle('temp', (event, arg) => {
 
-        //current temp
+        //current temp, if it did not return a value skip the next step
+        if(arg == ""){
+            return ""
+        }
+
         tray.setImage(str_to_image(arg.slice(0, 2)));
         tray.setToolTip(arg);
 
