@@ -5,10 +5,26 @@ body{
     background-color: rgb(227, 172, 69);
 }
 
+.location{
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
 .weather{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+img{
+    width: 45px;
+    height: 45px;
+}
+
+img:hover{
+    filter: opacity(0.2);
+    cursor: pointer;
 }
