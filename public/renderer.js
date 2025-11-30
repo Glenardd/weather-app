@@ -46,6 +46,14 @@ const day_or_night = (hours) => {
     const temp = weather_temp.toString() + " °C";
     window.weatherStore.temp(temp);
 
+    //  locate button
+    const locate_ = document.querySelector(".location");
+    locate_.innerHTML = '<img src="location.png">'
+
+    locate_.addEventListener("click", async() => {
+        await window.weatherStore.location();
+    });
+
     const info_weather = () => {
 
         const date_ = new Date();
