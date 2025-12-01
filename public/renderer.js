@@ -15,11 +15,11 @@ let weatherInterval;
 //display current weather and temp base on date and time 
 const weather_update = async () => {
     const weather = await window.weatherStore.api();
-    // console.log(weather.status, " ", weather.data);
+    console.log(weather.status, " ", weather.data);
 
     const hour_ = weather.data.hourly.time;
     const temp_ = weather.data.hourly.temperature_2m;
-    const weather_code = weather.data.hourly.weather_code;
+    const weather_code = weather.data?.hourly?.weather_code;
 
     const current_time = new Date(Date.now());
 
@@ -36,12 +36,12 @@ const weather_update = async () => {
         return current_time.getDate() === weather_time.getDate() && current_time.getHours() === weather_time.getHours();
     });
 
-    const weather_number = current_weather[0].weather_code;
-    const weather_temp = current_weather[0].temperature;
-    const weather_time = current_weather[0].time.getHours();
+    const weather_number = current_weather[0]?.weather_code;
+    const weather_temp = current_weather[0]?.temperature;
+    const weather_time = current_weather[0]?.time.getHours();
 
     // search the weather code using the weather number
-    const weather_day = day_or_night(weather_time) === 'day' ? weather_type[weather_number].day : weather_type[weather_number].night;
+    const weather_day = day_or_night(weather_time) === 'day' ? weather_type[weather_number]?.day : weather_type[weather_number]?.night;
     const temp = weather_temp.toString() + " °C";
     window.weatherStore.temp(temp);
 
@@ -58,8 +58,8 @@ const weather_update = async () => {
         minutes = minutes < 10 ? '0' + minutes : minutes;
 
         document.querySelector(".weather").innerHTML = `
-            <img src="${weather_day.image}" alt="${weather_day.description}">
-            <h1>${weather_day.description}</h1>
+            <img src="${weather_day.image}" alt="${weather_day?.description}">
+            <h1>${weather_day?.description}</h1>
             <h2>${weather_temp} °C</h2>
             <h3>${hours} : ${minutes} : ${seconds} ${ampm}</h3>    
         `;
@@ -71,6 +71,8 @@ const weather_update = async () => {
     info_weather();
 
 };
+
+(async ()=> await weather_update())();
 
 //  location form
 const locate_form = document.querySelector(".location");
