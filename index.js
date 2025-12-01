@@ -18,6 +18,7 @@ let tray;
 let latitude;
 let longitude;
 
+//filepath for weather data
 const filePath = path.join(app.getPath('userData'), 'weather.json');
 
 //create icon
@@ -142,7 +143,17 @@ ipcMain.handle('get-api', async () => {
     if(latitude === "" || longitude === "") return "";
 
     // rewrite again if lat and lon are called
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    if (fs.existsSync(filePath)) {
+        const data = fs.readFileSync(filePath);
+        
+        const lat_ = Math.round(JSON.parse(data).latitude * 4)/4
+        const lon_ = Math.round(JSON.parse(data).longitude * 4)/4
+
+        if(Math.round(latitude * 4)/4 === lat_ && Math.round(longitude * 4)/4 === lon_){
+            console.log("🌤 using cached weather data ...");
+            return { status: "🌤 cached weather data ", data: JSON.parse(data) };
+        };
+    };
 
     console.log("🌤 Fetching new weather...");
     const response = await fetch(
