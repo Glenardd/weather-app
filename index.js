@@ -20,6 +20,7 @@ let longitude;
 
 //filepath for weather data
 const filePath = path.join(app.getPath('userData'), 'weather.json');
+const coordinates = path.join(app.getPath('userData'), 'coordinates.json');
 
 //create icon
 const str_to_image = (weather) => {
@@ -131,6 +132,14 @@ app.on('window-all-closed', () => {
 ipcMain.handle('locate', async (event, arg) => {
     latitude = arg.latitude;
     longitude = arg.longitude;
+
+    const data = {
+        lat: latitude,
+        long: longitude,
+    };
+
+    // if the inputs have value add the coordinates to the json
+    if(latitude !== "" && longitude !== "") fs.writeFileSync(coordinates,JSON.stringify(data, null, 2));
 });
 
 // call api here it is more secure
@@ -138,6 +147,11 @@ ipcMain.handle('get-api', async () => {
 
     // const latitude = 9.7392;
     // const longitude = 118.7353;
+
+    // load the saved coordinates
+    const coordinates_ = JSON.parse(fs.readFileSync(coordinates, "utf8"));    
+    latitude = parseFloat(coordinates_.lat);
+    longitude = parseFloat(coordinates_.long);
 
     // do not do anything if input is empty
     if(latitude === "" || longitude === "") return "";
