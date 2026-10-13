@@ -20,7 +20,7 @@ A lightweight desktop weather app that lives in your system tray. It shows the c
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (LTS recommended)
+- [Node.js](https://nodejs.org/)
 - npm
 
 ### Installation
@@ -63,7 +63,3 @@ weather-app/
 - [x] Real-time updates
 - [x] Change location by latitude and longitude
 - [x] Save location between launches
-
-## Author
-
-Jan ([@Glenardd](https://github.com/Glenardd))
